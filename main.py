@@ -22,7 +22,7 @@ PERSONALIDADES = {
 
 @client.event
 async def on_ready():
-    print(f"Conectado como {client.user}")
+    print("Bot conectado como", client.user)
 
 @client.event
 async def on_message(message):
@@ -36,27 +36,7 @@ async def on_message(message):
 
     for nombre in PERSONALIDADES:
         if nombre in contenido:
-            try:
-                headers = {
-                    "Authorization": f"Bearer {HF_TOKEN}"
-                }
+            await message.channel.send("Estoy procesando...")
+            break
 
-                api_url = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
-
-                prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
-
-                payload = {
-                    "inputs": prompt,
-                    "parameters": {
-                        "max_new_tokens": 200
-                    }
-                }
-
-                response = requests.post(api_url, headers=headers, json=payload)
-
-                print("STATUS:", response.status_code)
-                print("TEXT:", response.text)
-
-                if response.status_code != 200:
-                    await
-
+client.run(TOKEN)
