@@ -3,7 +3,7 @@ import os
 import requests
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-AI_KEY = os.getenv("OPENROUTER_KEY")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -41,41 +41,8 @@ async def on_message(message):
         if nombre in contenido:
             try:
                 headers = {
-                    "Authorization": f"Bearer {AI_KEY}",
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "https://railway.app",
-                    "X-Title": "MultiverseBot"
+                    "Authorization": f"Bearer {HF_TOKEN}"
                 }
 
-                data = {
-                    "model": "openchat/openchat-7b:free",
-                    "messages": [
-                        {"role": "system", "content": PERSONALIDADES[nombre]},
-                        {"role": "user", "content": message.content}
-                    ],
-                    "max_tokens": 200
-                }
+                api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 
-                response = requests.post(
-                    "https://openrouter.ai/api/v1/chat/completions",
-                    headers=headers,
-                    json=data
-                )
-
-                resultado = response.json()
-                print("RESPUESTA API:", resultado)
-
-                if "choices" not in resultado:
-                    print("ERROR EN RESPUESTA:", resultado)
-                    return
-
-                reply = resultado["choices"][0]["message"]["content"]
-
-                await message.channel.send(reply)
-
-            except Exception as e:
-                print("ERROR GENERAL:", e)
-
-            break
-
-client.run(TOKEN)
