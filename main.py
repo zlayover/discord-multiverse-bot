@@ -43,16 +43,14 @@ async def on_message(message):
                     "Authorization": f"Bearer {HF_TOKEN}"
                 }
 
-                api_url = "https://router.huggingface.co/hf-inference/models/google/flan-t5-base"
+            api_url = "https://router.huggingface.co/v1/models/google/flan-t5-base"
 
-                prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
-
-                payload = {
-                    "inputs": prompt,
-                    "parameters": {
-                        "max_new_tokens": 100
-                    }
-                }
+payload = {
+    "messages": [
+        {"role": "user", "content": prompt}
+    ],
+    "max_tokens": 100
+}
 
                 response = requests.post(api_url, headers=headers, json=payload)
 
