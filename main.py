@@ -49,7 +49,7 @@ async def on_message(message):
                 prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
 
                 payload = {
-                    "model": "google/flan-t5-base",
+                    "model": "HuggingFaceH4/zephyr-7b-beta",
                     "messages": [
                         {"role": "user", "content": prompt}
                     ],
