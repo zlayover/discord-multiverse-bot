@@ -40,17 +40,21 @@ async def on_message(message):
 
             try:
                 headers = {
-                    "Authorization": f"Bearer {HF_TOKEN}"
+                    "Authorization": f"Bearer {HF_TOKEN}",
+                    "Content-Type": "application/json"
                 }
 
-            api_url = "https://router.huggingface.co/v1/models/google/flan-t5-base"
+                api_url = "https://router.huggingface.co/v1/chat/completions"
 
-payload = {
-    "messages": [
-        {"role": "user", "content": prompt}
-    ],
-    "max_tokens": 100
-}
+                prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
+
+                payload = {
+                    "model": "google/flan-t5-base",
+                    "messages": [
+                        {"role": "user", "content": prompt}
+                    ],
+                    "max_tokens": 100
+                }
 
                 response = requests.post(api_url, headers=headers, json=payload)
 
@@ -63,11 +67,9 @@ payload = {
 
                 resultado = response.json()
 
-                if isinstance(resultado, list):
-                    reply = resultado[0]["generated_text"]
-                    await message.channel.send(reply)
-                else:
-                    await message.channel.send("Respuesta inesperada.")
+                reply = resultado["choices"][0]["message"]["content"]
+
+                await message.channel.send(reply)
 
             except Exception as e:
                 print("ERROR:", e)
