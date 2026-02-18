@@ -41,7 +41,7 @@ async def on_message(message):
                     "Authorization": f"Bearer {HF_TOKEN}"
                 }
 
-                api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+                api_url = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2"
 
                 prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
 
