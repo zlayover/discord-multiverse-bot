@@ -29,6 +29,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    print("MENSAJE RECIBIDO:", message.content)
+    print("CANAL ID:", message.channel.id)
+
     if message.channel.id != CANAL_PERMITIDO:
         return
 
