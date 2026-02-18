@@ -3,12 +3,13 @@ import os
 import requests
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-AI_URL = "https://api.openai.com/v1/chat/completions"
-AI_KEY = os.getenv("OPENAI_KEY")
+AI_KEY = os.getenv("OPENROUTER_KEY")
 
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
+
+CANAL_PERMITIDO = 1473768938151088233
 
 PERSONALIDADES = {
     "jungkook": "Eres Jeon Jungkook. Hablas relajado, dulce, algo tímido pero seguro. Nunca dices que eres un bot.",
@@ -27,16 +28,10 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-CANAL_PERMITIDO = 1473768938151088233
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
 
     if message.channel.id != CANAL_PERMITIDO:
         return
-    
+
     contenido = message.content.lower()
 
     for nombre in PERSONALIDADES:
@@ -49,13 +44,24 @@ async def on_message(message):
             }
 
             data = {
-                "model": "gpt-3.5-turbo",
-                "messages": [{"role": "user", "content": prompt}],
+                "model": "mistralai/mistral-7b-instruct",  # modelo gratis
+                "messages": [
+                    {"role": "system", "content": PERSONALIDADES[nombre]},
+                    {"role": "user", "content": message.content}
+                ],
                 "max_tokens": 200
             }
 
-            response = requests.post(AI_URL, headers=headers, json=data)
-            reply = response.json()["choices"][0]["message"]["content"]
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=data
+            )
+
+            resultado = response.json()
+            print(resultado)  # debug por si falla
+
+            reply = resultado["choices"][0]["message"]["content"]
 
             await message.channel.send(reply)
             break
