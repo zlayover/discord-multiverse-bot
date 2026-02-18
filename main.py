@@ -27,7 +27,16 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+CANAL_PERMITIDO = 1473768938151088233
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.channel.id != CANAL_PERMITIDO:
+        return
+    
     contenido = message.content.lower()
 
     for nombre in PERSONALIDADES:
