@@ -36,7 +36,45 @@ async def on_message(message):
 
     for nombre in PERSONALIDADES:
         if nombre in contenido:
-            await message.channel.send("Estoy procesando...")
+            await message.channel.send("Pensando...")
+
+            try:
+                headers = {
+                    "Authorization": f"Bearer {HF_TOKEN}"
+                }
+
+                api_url = "https://router.huggingface.co/hf-inference/models/google/flan-t5-base"
+
+                prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
+
+                payload = {
+                    "inputs": prompt,
+                    "parameters": {
+                        "max_new_tokens": 100
+                    }
+                }
+
+                response = requests.post(api_url, headers=headers, json=payload)
+
+                print("STATUS:", response.status_code)
+                print("TEXT:", response.text)
+
+                if response.status_code != 200:
+                    await message.channel.send("Error con la IA.")
+                    return
+
+                resultado = response.json()
+
+                if isinstance(resultado, list):
+                    reply = resultado[0]["generated_text"]
+                    await message.channel.send(reply)
+                else:
+                    await message.channel.send("Respuesta inesperada.")
+
+            except Exception as e:
+                print("ERROR:", e)
+                await message.channel.send("Ocurrió un error.")
+
             break
 
 client.run(TOKEN)
