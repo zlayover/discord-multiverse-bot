@@ -29,9 +29,6 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    print("MENSAJE RECIBIDO:", message.content)
-    print("CANAL ID:", message.channel.id)
-
     if message.channel.id != CANAL_PERMITIDO:
         return
 
@@ -46,3 +43,29 @@ async def on_message(message):
 
                 api_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
 
+                prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
+
+                payload = {
+                    "inputs": prompt,
+                    "parameters": {
+                        "max_new_tokens": 200
+                    }
+                }
+
+                response = requests.post(api_url, headers=headers, json=payload)
+                resultado = response.json()
+
+                print("RESPUESTA HF:", resultado)
+
+                if isinstance(resultado, list):
+                    reply = resultado[0]["generated_text"]
+                    await message.channel.send(reply)
+                else:
+                    print("ERROR EN RESPUESTA:", resultado)
+
+            except Exception as e:
+                print("ERROR GENERAL:", e)
+
+            break
+
+client.run(TOKEN)
