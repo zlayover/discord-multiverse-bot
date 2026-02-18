@@ -48,7 +48,7 @@ async def on_message(message):
                 }
 
                 data = {
-                    "model": "mistralai/mistral-7b-instruct",
+                    "model": "openchat/openchat-7b:free",
                     "messages": [
                         {"role": "system", "content": PERSONALIDADES[nombre]},
                         {"role": "user", "content": message.content}
