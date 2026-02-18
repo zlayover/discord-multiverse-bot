@@ -41,10 +41,13 @@ async def on_message(message):
         if nombre in contenido:
             prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
 
-            headers = {
-                "Authorization": f"Bearer {AI_KEY}",
-                "Content-Type": "application/json"
-            }
+       headers = {
+    "Authorization": f"Bearer {AI_KEY}",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://railway.app",
+    "X-Title": "MultiverseBot"
+}
+
 
             data = {
                 "model": "mistralai/mistral-7b-instruct",  # modelo gratis
@@ -64,7 +67,12 @@ async def on_message(message):
             resultado = response.json()
             print(resultado)  # debug por si falla
 
-            reply = resultado["choices"][0]["message"]["content"]
+            if "choices" not in resultado:
+    print("ERROR DE OPENROUTER:", resultado)
+    return
+
+reply = resultado["choices"][0]["message"]["content"]
+
 
             await message.channel.send(reply)
             break
