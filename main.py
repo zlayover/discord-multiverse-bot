@@ -52,8 +52,16 @@ async def on_message(message):
                     }
                 }
 
-                response = requests.post(api_url, headers=headers, json=payload)
-                resultado = response.json()
+               response = requests.post(api_url, headers=headers, json=payload)
+
+print("STATUS CODE:", response.status_code)
+print("RAW RESPONSE:", response.text)
+
+if response.status_code != 200:
+    print("ERROR HTTP:", response.text)
+    return
+
+resultado = response.json()
 
                 print("RESPUESTA HF:", resultado)
 
