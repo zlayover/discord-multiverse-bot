@@ -39,42 +39,43 @@ async def on_message(message):
 
     for nombre in PERSONALIDADES:
         if nombre in contenido:
-            prompt = PERSONALIDADES[nombre] + "\nUsuario: " + message.content
+            try:
+                headers = {
+                    "Authorization": f"Bearer {AI_KEY}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://railway.app",
+                    "X-Title": "MultiverseBot"
+                }
 
-       headers = {
-    "Authorization": f"Bearer {AI_KEY}",
-    "Content-Type": "application/json",
-    "HTTP-Referer": "https://railway.app",
-    "X-Title": "MultiverseBot"
-}
+                data = {
+                    "model": "mistralai/mistral-7b-instruct",
+                    "messages": [
+                        {"role": "system", "content": PERSONALIDADES[nombre]},
+                        {"role": "user", "content": message.content}
+                    ],
+                    "max_tokens": 200
+                }
 
+                response = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers=headers,
+                    json=data
+                )
 
-            data = {
-                "model": "mistralai/mistral-7b-instruct",  # modelo gratis
-                "messages": [
-                    {"role": "system", "content": PERSONALIDADES[nombre]},
-                    {"role": "user", "content": message.content}
-                ],
-                "max_tokens": 200
-            }
+                resultado = response.json()
+                print("RESPUESTA API:", resultado)
 
-            response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers,
-                json=data
-            )
+                if "choices" not in resultado:
+                    print("ERROR EN RESPUESTA:", resultado)
+                    return
 
-            resultado = response.json()
-            print(resultado)  # debug por si falla
+                reply = resultado["choices"][0]["message"]["content"]
 
-            if "choices" not in resultado:
-    print("ERROR DE OPENROUTER:", resultado)
-    return
+                await message.channel.send(reply)
 
-reply = resultado["choices"][0]["message"]["content"]
+            except Exception as e:
+                print("ERROR GENERAL:", e)
 
-
-            await message.channel.send(reply)
             break
 
 client.run(TOKEN)
